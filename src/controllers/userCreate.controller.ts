@@ -1,4 +1,5 @@
 import { Request, Response } from 'express'
+import { AppError, handleError } from '../errors/AppError'
 import userCreateService from '../services/userCreate.service'
 
 const userCreateController = async (req: Request, res: Response) => {
@@ -8,16 +9,12 @@ const userCreateController = async (req: Request, res: Response) => {
         const { name, email, password, age } = req.body
         const newUser = await userCreateService({name, email, password, age})
         
-        return res.status(201).send(newUser)
+        return res.status(201).json(newUser)
 
     } catch (err) {
 
-        if (err instanceof Error) {
-
-            return res.status(400).send({
-                "error": err.name,
-                "message": err.message
-            })
+        if (err instanceof AppError) {
+            handleError(err, res)
         }
     }
 }
